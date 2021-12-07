@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIRECTV Prepago Canales</title>
+    <link rel="shortcut icon"
+        href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSP4Rt5xmt_nFFSeVmaMDMZloS8JT53bdzEug&usqp=CAU"
+        type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        .channels-row {
+            flex-wrap: wrap;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .channels-row .col {
+            transform: scale(1);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: .5rem;
+            margin-left: .5rem;
+        }
+
+        .channels-row p {
+            font-size: .55rem;
+        }
+
+        .channels-row .card-img-top {
+            width: 80px;
+            height: 25px;
+            margin-bottom: .5rem;
+            object-fit: contain;
+        }
+
+        .flexCenter {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @media screen and (max-width: 500px) {
+            .channels-row .col {
+                width: 100%;
+            }
+        }
+
+        @media print {
+            .channels-row div {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            .channels-row .card {
+                margin: 0;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+</head>
+
+<body>
+
+    <div class="container-fluid py-4 px-4">
+        <h1 class="h2 text-center">Listado de Canales para Directv Prepago</h1>
+
+        <div id="channelsListDirectv">
+            <input class="search form-control ds-input my-4" placeholder="Buscar mi canal favorito..." />
+            <ul class="row channels-row list"></ul>
+        </div>
+        <footer>
+            <p class="text-center h5 fw-bold">Por Stalin Maza</p>
+        </footer>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+<script>
+    axios.get('http://localhost:3000/api')
+        .then(function (response) {
+            console.log('response', response)
+            const channelsList = response.data.channels;
+            console.log('channelsList', channelsList)
+            const channelsHTML = JSON.parse(JSON.stringify(channelsList)).map((el) => {
+                return {
+                    ...el, html: `
+                    <div class="card align-items-center justify-content-center h-100">
+                        <div class="card-wrapper-tv">
+                        <div class="flexCenter">
+                        <img src="${el.img_url}" class="card-img-top" alt="Canal: ${el.name}">
+                        </div>
+                        <p class="card-title text-center fw-bold channelName px-1">${el.name}</h5>
+                        <p class="card-title text-center channelNumber mb-0">${el.channel}</h5>
+                            </div>
+                    </div>
+                `}
+            });
+
+            const channelsRow = document.querySelector('.channels-row');
+            const channelsFragment = document.createDocumentFragment();
+
+            for (let index = 0; index < channelsHTML.length; index++) {
+                const element = channelsHTML[index];
+                const colDOM = document.createElement('li')
+                colDOM.classList.add('col');
+                colDOM.classList.add('px-0');
+                colDOM.innerHTML = element.html;
+                channelsFragment.appendChild(colDOM);
+            }
+            channelsRow.appendChild(channelsFragment)
+
+            const options = {
+                valueNames: ['channelName', 'channelNumber']
+            };
+            let hackerList = new List('channelsListDirectv', options);
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        })
+        .then(function () {
+            // always executed
+        });
+</script>
+
+</html>
